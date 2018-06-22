@@ -1,5 +1,6 @@
 package ua.pp.nedosika.chat.client;
 
+import ua.pp.nedosika.chat.network.Message;
 import ua.pp.nedosika.chat.network.TCPConnection;
 import ua.pp.nedosika.chat.network.TCPConnectionListener;
 
@@ -14,6 +15,7 @@ public class Client implements TCPConnectionListener{
 
     private TCPConnection connection;
     private BufferedReader keyboard;
+    private String name;
 
     public static void main(String[] args) {
         new Client();
@@ -21,19 +23,22 @@ public class Client implements TCPConnectionListener{
 
     private Client(){
         try {
-            connection = new TCPConnection(this, "127.0.0.1", 8189);
+            System.out.println("Введите Ваше имя:");
             keyboard = new BufferedReader( new InputStreamReader( System.in ) );
-
             String message = null;
-            System.out.println("Наберите сообщение и нажмите \"Enter\"");
+            name = keyboard.readLine();
+
+            System.out.println("connecting...");
+            connection = new TCPConnection(this, "127.0.0.1", 8189);
+            System.out.println("connected");
 
             while (true){
                 message = keyboard.readLine();
-                connection.sendMessage(message);
+                connection.sendMessage(new Message("Server" , message));
             }
 
         } catch (IOException e) {
-            printMessage("Connection exception: " + e);
+            System.out.println(e);
         }
     }
 
@@ -43,7 +48,7 @@ public class Client implements TCPConnectionListener{
     }
 
     @Override
-    public void onReceiveString(TCPConnection tcpConnection, String message) {
+    public void onReceiveString(TCPConnection tcpConnection, Message message) {
         printMessage(message);
     }
 
@@ -57,7 +62,7 @@ public class Client implements TCPConnectionListener{
         System.out.println("Connection close");
     }
 
-    private synchronized void printMessage(String mesasge){
-        System.out.println(mesasge);
+    private synchronized void printMessage(Message mesasge){
+        System.out.println(mesasge.getMessage());
     }
 }

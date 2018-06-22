@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.ArrayList;
 
+import ua.pp.nedosika.chat.network.Message;
 import ua.pp.nedosika.chat.network.TCPConnection;
 import ua.pp.nedosika.chat.network.TCPConnectionListener;
 
@@ -36,33 +37,32 @@ public class Server implements TCPConnectionListener{
     }
 
     @Override
-    public synchronized void onConnectionReady(ua.pp.nedosika.chat.network.TCPConnection tcpConnection) {
+    public synchronized void onConnectionReady(TCPConnection tcpConnection) {
         connections.add(tcpConnection);
-        sendToAllConnection("Client connection: " + tcpConnection);
+        sendToAllConnection(new Message ("Server", "Client connection: " + tcpConnection));
     }
 
     @Override
-    public synchronized void onReceiveString(ua.pp.nedosika.chat.network.TCPConnection tcpConnection, String message) {
+    public synchronized void onReceiveString(TCPConnection tcpConnection, Message message) {
         sendToAllConnection(message);
     }
 
     @Override
-    public synchronized void onException(ua.pp.nedosika.chat.network.TCPConnection tcpConnection, IOException e) {
+    public synchronized void onException(TCPConnection tcpConnection, IOException e) {
         System.out.println("TCPConnection exception: " + e);
     }
 
     @Override
-    public synchronized void onDisconnect(ua.pp.nedosika.chat.network.TCPConnection tcpConnection) {
+    public synchronized void onDisconnect(TCPConnection tcpConnection) {
         connections.remove(tcpConnection);
-        sendToAllConnection("Client disconnected: " + tcpConnection);
+        sendToAllConnection(new Message("Server", "Client disconnected: " + tcpConnection));
     }
 
-    private void sendToAllConnection(String message){
-        System.out.println(message);
+    private void sendToAllConnection(Message message){
+        System.out.println(message.getMessage());
 
-        final int cnt = connections.size();
-        for (int i = 0; i < cnt; i++) {
-            connections.get(i).sendMessage(message);
+        for (TCPConnection connection: connections) {
+            connection.sendMessage(message);
         }
     }
 }

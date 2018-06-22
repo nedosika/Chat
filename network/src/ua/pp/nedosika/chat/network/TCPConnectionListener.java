@@ -7,7 +7,7 @@ import java.io.IOException;
  */
 public interface TCPConnectionListener {
     void onConnectionReady(TCPConnection tcpConnection);
-    void onReceiveString(TCPConnection tcpConnection, String message);
+    void onReceiveString(TCPConnection tcpConnection, Message message);
     void onException(TCPConnection tcpConnection, IOException e);
     void onDisconnect(TCPConnection tcpConnection);
 

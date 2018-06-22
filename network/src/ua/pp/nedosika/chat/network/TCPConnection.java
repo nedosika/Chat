@@ -2,7 +2,6 @@ package ua.pp.nedosika.chat.network;
 
 import java.io.*;
 import java.net.Socket;
-import java.nio.charset.Charset;
 
 /**
  * Created by nedos on 21.06.2018.
@@ -11,8 +10,8 @@ public class TCPConnection {
     private final Socket socket;
     private final Thread rxThread;
     private final TCPConnectionListener eventListener;
-    private final BufferedReader in;
-    private final BufferedWriter out;
+    private final ObjectInputStream in;
+    private final ObjectOutputStream out;
 
     public TCPConnection(TCPConnectionListener eventListener, String ipAddress, int port) throws IOException{
         this(eventListener, new Socket(ipAddress, port));
@@ -22,8 +21,9 @@ public class TCPConnection {
         this.eventListener = eventListener;
         this.socket = socket;
 
-        in = new BufferedReader(new InputStreamReader(socket.getInputStream(), Charset.forName("UTF-8")));
-        out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), Charset.forName("UTF-8")));
+        in = new ObjectInputStream(socket.getInputStream());
+        out = new ObjectOutputStream(socket.getOutputStream());
+
         rxThread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -31,15 +31,16 @@ public class TCPConnection {
                     eventListener.onConnectionReady(TCPConnection.this);
 
                     while(!rxThread.isInterrupted()){
-                        String message = in.readLine();
+                        Message message = (Message) in.readObject();
                         eventListener.onReceiveString(TCPConnection.this, message);
                     }
 
                 }
                 catch (IOException e){
                     eventListener.onException(TCPConnection.this, e );
-                }
-                finally {
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                } finally {
                     eventListener.onDisconnect(TCPConnection.this);
                 }
             }
@@ -48,10 +49,11 @@ public class TCPConnection {
         rxThread.start();
     }
 
-    public synchronized void  sendMessage(String message){
+    public synchronized void  sendMessage(Message message){
         try {
-            out.write(message + "\r\n");
-            out.flush();
+            //out.write(message + "\r\n");
+            out.writeObject(message);
+            //out.flush();
         } catch (IOException e) {
             eventListener.onException(TCPConnection.this, e );
             disconnect();
@@ -71,4 +73,5 @@ public class TCPConnection {
     public String toString() {
         return "TCPConnection " + socket.getInetAddress() + ": " + socket.getPort();
     }
+
 }
