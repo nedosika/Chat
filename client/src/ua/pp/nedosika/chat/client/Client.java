@@ -15,7 +15,7 @@ public class Client implements TCPConnectionListener{
 
     private TCPConnection connection;
     private BufferedReader keyboard;
-    private String name;
+    private String login;
 
     public static void main(String[] args) {
         new Client();
@@ -25,16 +25,14 @@ public class Client implements TCPConnectionListener{
         try {
             System.out.println("Введите Ваше имя:");
             keyboard = new BufferedReader( new InputStreamReader( System.in ) );
-            String message = null;
-            name = keyboard.readLine();
+            login = keyboard.readLine();
 
-            System.out.println("connecting...");
+            String message = null;
             connection = new TCPConnection(this, "127.0.0.1", 8189);
-            System.out.println("connected");
 
             while (true){
                 message = keyboard.readLine();
-                connection.sendMessage(new Message("Server" , message));
+                connection.sendMessage(new Message(login , message));
             }
 
         } catch (IOException e) {
@@ -62,7 +60,7 @@ public class Client implements TCPConnectionListener{
         System.out.println("Connection close");
     }
 
-    private synchronized void printMessage(Message mesasge){
-        System.out.println(mesasge.getMessage());
+    private synchronized void printMessage(Message message){
+        System.out.println(message.getSender() +": "+ message.getMessage());
     }
 }
