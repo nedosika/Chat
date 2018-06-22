@@ -3,19 +3,19 @@ package ua.pp.nedosika.chat.network;
 import java.io.Serializable;
 
 public class Message implements Serializable{
-    private String sender;
+    private User sender;
     private String message;
 
-    public Message(String sender, String message){
+    public Message(User sender, String message){
         this.sender = sender;
         this.message = message;
     }
 
-    public String getSender() {
+    public User getSender() {
         return sender;
     }
 
-    public void setSender(String sender) {
+    public void setSender(User sender) {
         this.sender = sender;
     }
 

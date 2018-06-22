@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import ua.pp.nedosika.chat.network.Message;
 import ua.pp.nedosika.chat.network.TCPConnection;
 import ua.pp.nedosika.chat.network.TCPConnectionListener;
+import ua.pp.nedosika.chat.network.User;
 
 /**
  * Created by nedos on 21.06.2018.
@@ -39,7 +40,8 @@ public class Server implements TCPConnectionListener{
     @Override
     public synchronized void onConnectionReady(TCPConnection tcpConnection) {
         connections.add(tcpConnection);
-        sendToAllConnection(new Message ("Server", "Client connection: " + tcpConnection));
+        System.out.println("Client connection: " + tcpConnection);
+        //sendToAllConnection(new Message (new User("Server"), "Client connection: " + tcpConnection));
     }
 
     @Override
@@ -55,11 +57,12 @@ public class Server implements TCPConnectionListener{
     @Override
     public synchronized void onDisconnect(TCPConnection tcpConnection) {
         connections.remove(tcpConnection);
-        sendToAllConnection(new Message("Server", "Client disconnected: " + tcpConnection));
+        System.out.println("Client disconnected: " + tcpConnection);
+        //sendToAllConnection(new Message(new User("Server"), "Client disconnected: " + tcpConnection));
     }
 
     private void sendToAllConnection(Message message){
-        System.out.println(message.getMessage());
+        System.out.println(message.getSender().getName() + ": " + message.getMessage());
 
         for (TCPConnection connection: connections) {
             connection.sendMessage(message);

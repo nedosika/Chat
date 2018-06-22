@@ -1,7 +1,11 @@
 package ua.pp.nedosika.chat.network;
 
-public class User {
+import java.io.Serializable;
+
+public class User implements Serializable {
     private String name;
+    private String password;
+    private int level = 0;
 
     public User(){
 
@@ -17,5 +21,13 @@ public class User {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
     }
 }

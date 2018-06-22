@@ -15,6 +15,8 @@ public class TCPConnection {
     private final ObjectOutputStream out;
     private final ObjectInputStream in;
 
+    private User user;
+
     public TCPConnection(TCPConnectionListener eventListener, String ipAddress, int port) throws IOException{
         this(eventListener, new Socket(ipAddress, port));
     }
