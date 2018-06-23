@@ -1,5 +1,6 @@
 package ua.pp.nedosika.chat.client;
 
+import com.sun.security.ntlm.Server;
 import ua.pp.nedosika.chat.network.Message;
 import ua.pp.nedosika.chat.network.TCPConnection;
 import ua.pp.nedosika.chat.network.TCPConnectionListener;
@@ -24,10 +25,15 @@ public class Client implements TCPConnectionListener{
 
     private Client(){
         try {
-            System.out.println("Введите Ваше имя:");
             keyboard = new BufferedReader( new InputStreamReader( System.in ) );
 
-            user = new User(keyboard.readLine());
+            System.out.println("Введите Ваше имя:");
+            String login = keyboard.readLine();
+
+            System.out.println("Введите пароль:");
+            String password = keyboard.readLine();
+
+            user = new User(login);
 
             System.out.println("Connection to Server...");
             connection = new TCPConnection(this, "127.0.0.1", 8189);
@@ -66,6 +72,6 @@ public class Client implements TCPConnectionListener{
     }
 
     private synchronized void printMessage(Message message){
-        System.out.println(message.getSender().getName() +"[" + message.getSender().getLevel() + "] "+ message.getMessage());
+        System.out.println(message.getDate() + " " + message.getSender().getName() +"[" + message.getSender().getLevel() + "] "+ message.getMessage());
     }
 }

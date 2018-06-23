@@ -4,10 +4,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.ArrayList;
 
-import ua.pp.nedosika.chat.network.Message;
-import ua.pp.nedosika.chat.network.TCPConnection;
-import ua.pp.nedosika.chat.network.TCPConnectionListener;
-import ua.pp.nedosika.chat.network.User;
+import ua.pp.nedosika.chat.network.*;
 
 /**
  * Created by nedos on 21.06.2018.
@@ -18,6 +15,8 @@ public class Server implements TCPConnectionListener{
     }
 
     private final ArrayList<TCPConnection> connections = new ArrayList<>();
+
+    private static History chatHistory = new History();
 
     private Server(){
         System.out.println("Server starting...");
@@ -41,12 +40,16 @@ public class Server implements TCPConnectionListener{
     public synchronized void onConnectionReady(TCPConnection tcpConnection) {
         connections.add(tcpConnection);
         System.out.println("Client connection: " + tcpConnection);
-        //sendToAllConnection(new Message (new User("Server"), "Client connection: " + tcpConnection));
+
+        for(Message message : chatHistory.getHistory()){
+            tcpConnection.sendMessage(message);
+        }
     }
 
     @Override
     public synchronized void onReceiveString(TCPConnection tcpConnection, Message message) {
         sendToAllConnection(message);
+        chatHistory.addMessage(message);
     }
 
     @Override
@@ -62,7 +65,7 @@ public class Server implements TCPConnectionListener{
     }
 
     private void sendToAllConnection(Message message){
-        System.out.println(message.getSender().getName() + ": " + message.getMessage());
+        System.out.println(message.getDate() + " [" + message.getSender().getName() + "] " + message.getMessage());
 
         for (TCPConnection connection: connections) {
             connection.sendMessage(message);
